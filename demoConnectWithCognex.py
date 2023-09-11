@@ -1,10 +1,8 @@
-import getpass
-import sys
 import telnetlib
 from ftplib import FTP
 import time
 import cv2
-from ultralytics import YOLO
+# from ultralytics import YOLO
 
 # Set up the timer variables
 interval = 2  # Time interval in seconds
@@ -14,7 +12,6 @@ prev_time = time.time()
 ip = "192.168.3.66"
 user = 'admin'
 password = '123456'
-# password2 = getpass.getpass()
 
 # model = YOLO("film_error_best.pt")
 fileSavePath = "D:\Learning_Python\PythonProject\Image"
