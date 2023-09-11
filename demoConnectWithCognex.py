@@ -1,3 +1,4 @@
+import getpass
 import sys
 import telnetlib
 from ftplib import FTP
@@ -13,58 +14,73 @@ prev_time = time.time()
 ip = "192.168.3.66"
 user = 'admin'
 password = '123456'
+# password2 = getpass.getpass()
 
-model = YOLO("film_error_best.pt")
+# model = YOLO("film_error_best.pt")
 fileSavePath = "D:\Learning_Python\PythonProject\Image"
 # out = cv2.VideoWriter('output.mp4', -1, 20.0, (640,480))
 
+
+
 while True:
-    start_time = time.time()
-    tn = telnetlib.Telnet(ip)
-    telnet_user = user + '\r\n'
-    tn.write(telnet_user.encode('ascii'))
-    tn.write("\r\n".encode('ascii'))
+    try:
+        start_time = time.time()
+        tn = telnetlib.Telnet(ip)
+        tn.read_until(b"User: ")
+        tn.write(user.encode('ascii') + b"\r\n")
+        # print("fill user")
 
-    # time.sleep(0.1)
-    tn.write(b"SE8\r\n")
-    # time.sleep(0.1)
+        tn.read_until(b"Password: ")
+        tn.write(password.encode('ascii') + b"\r\n")
+        # print("fill password")
 
-    ftp = FTP(ip)
-    ftp.login(user, password)
+        response = tn.read_until(b"\r\n")
+        # print(response)
 
-    # ftp.sendcmd('get image.bmp\r\n')
-    # print("--- %s seconds ---" % (time.time() - start_time))
+        # time.sleep(0.1)
+        tn.write(b"SE8\r\n")
+        # response = tn.read_until(b"\n")
 
-    filename = 'image.bmp'
-    rename = 'image_get.bmp'
-    lf = open(rename, "wb")
-    ftp.retrbinary("RETR " + filename, lf.write)
-    lf.close()
+        # time.sleep(0.1)
 
-    image = cv2.imread(rename)
-    cv2.imshow('Image', image)
-    # try:
-    #     results = model.predict(show=True, source=image)
-    # except:
-    #     print("Something wrong")
+        ftp = FTP(ip)
+        ftp.login(user, password)
 
-    # Calculate the elapsed time since the last save
-    curr_time = time.time()
-    elapsed_time = curr_time - prev_time
+        # ftp.sendcmd('get image.bmp\r\n')
+        # print("--- %s seconds ---" % (time.time() - start_time))
 
-    # Check if the elapsed time has reached the desired interval
-    # print(str(elapsed_time))
-    # print(str(interval))
-    if elapsed_time >= interval:
-        # Save the frame as an image
-        cv2.imwrite(fileSavePath + "\image" + str(time.time())+".png", image)
+        filename = 'image.bmp'
+        rename = 'image_get.bmp'
+        lf = open(rename, "wb")
+        ftp.retrbinary("RETR " + filename, lf.write)
+        lf.close()
 
-        # Update the previous time
-        prev_time = curr_time
-    # print("--- %s seconds ---" % (time.time() - start_time))
-    # out.write(image)
+        image = cv2.imread(rename)
+        cv2.imshow('Image', image)
+        # try:
+        #     results = model.predict(show=True, source=image)
+        # except:
+        #     print("Something wrong")
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        # Calculate the elapsed time since the last save
+        curr_time = time.time()
+        elapsed_time = curr_time - prev_time
+
+        # Check if the elapsed time has reached the desired interval
+        # print(str(elapsed_time))
+        # print(str(interval))
+        # if elapsed_time >= interval:
+        #     # Save the frame as an image
+        #     cv2.imwrite(fileSavePath + "\image" + str(time.time())+".png", image)
+        #
+        #     # Update the previous time
+        #     prev_time = curr_time
+        # print("--- %s seconds ---" % (time.time() - start_time))
+        # out.write(image)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    except:
+        print("Error")
 
 cv2.destroyAllWindows()
